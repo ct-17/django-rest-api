@@ -6,9 +6,11 @@ RUN mkdir /BE
 
 WORKDIR /BE
 
-COPY ./source/BE .
+COPY . .
 
-RUN pip install -r /requirements.txt
+RUN pip install -r requirements.txt
 
-RUN adduser -D iop
+RUN adduser iop
 USER iop
+
+CMD ["python", "manage.py", "runserver"]
