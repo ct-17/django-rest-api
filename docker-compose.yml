@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:15.2
+    container_name: db-iop
+    restart: always
+    networks:
+      - iop-django
+    environment:
+      - POSTGRES_DB=iop
+      - POSTGRES_USER=iop
+      - POSTGRES_PASSWORD=iop
+    expose:
+      - 3306
+      - 33060
+
+  backend:
+    container_name: backend-iop
+    build:
+      context: source/BE
+      target: builder
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - ./source/BE:/BE
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=iop
+      - DB_USER=iop
+      - DB_PASS=iop
+    networks:
+      - iop-django
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginx-iop
+    build: nginx
+    restart: always
+    ports:
+      - 8888:80
+    depends_on: 
+      - server
+    networks:
+      - iop-django
+
+volumes:
+  db-data:
+
+networks:
+  iop-django:
